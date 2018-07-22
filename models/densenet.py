@@ -206,7 +206,7 @@ class DenseNet(nn.Module):
         features = self.features(x)
         out = F.relu(features, inplace=True)
         last_duration = int(math.ceil(self.sample_duration / 16))
-        last_size = int(math.floor(self.sample_size / 32))
+        last_size = int(math.floor(self.sample_size / 32.0))
         out = F.avg_pool3d(
             out, kernel_size=(last_duration, last_size, last_size)).view(
                 features.size(0), -1)

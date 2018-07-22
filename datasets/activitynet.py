@@ -156,7 +156,7 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                                          (n_samples_for_each_video - 1)))
                 else:
                     step = sample_duration
-                for j in range(begin_t, end_t, step):
+                for j in range(begin_t, end_t, int(step)):
                     sample_j = copy.deepcopy(sample)
                     frame_indices = list(range(j, j + sample_duration))
                     frame_indices = modify_frame_indices(

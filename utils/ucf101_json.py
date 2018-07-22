@@ -4,6 +4,9 @@ import sys
 import json
 import pandas as pd
 
+
+target_classes = os.listdir(os.path.join('data', 'ucf101_videos', 'jpg'))
+
 def convert_csv_to_dict(csv_path, subset):
     data = pd.read_csv(csv_path, delimiter=' ', header=None)
     keys = []
@@ -12,6 +15,9 @@ def convert_csv_to_dict(csv_path, subset):
         row = data.ix[i, :]
         slash_rows = data.ix[i, 0].split('/')
         class_name = slash_rows[0]
+        if class_name not in target_classes:
+            continue
+
         basename = slash_rows[1].split('.')[0]
         
         keys.append(basename)
