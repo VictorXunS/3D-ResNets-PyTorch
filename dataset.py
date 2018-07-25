@@ -56,7 +56,7 @@ def get_training_set(opt, spatial_transform, temporal_transform,
 
 def get_validation_set(opt, spatial_transform, temporal_transform,
                        target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', '20bn-jester']
 
     if opt.dataset == 'kinetics':
         validation_data = Kinetics(
@@ -113,7 +113,7 @@ def get_validation_set(opt, spatial_transform, temporal_transform,
 
 
 def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
-    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51']
+    assert opt.dataset in ['kinetics', 'activitynet', 'ucf101', 'hmdb51', '20bn-jester']
     assert opt.test_subset in ['val', 'test']
 
     if opt.test_subset == 'val':

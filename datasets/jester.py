@@ -37,7 +37,7 @@ def get_default_image_loader():
 def video_loader(video_dir_path, frame_indices, image_loader):
     video = []
     for i in frame_indices:
-        image_path = os.path.join(video_dir_path, 'image_{:05d}.jpg'.format(i))
+        image_path = os.path.join(video_dir_path, '{:05d}.jpg'.format(i))
         if os.path.exists(image_path):
             video.append(image_loader(image_path))
         else:
@@ -66,12 +66,72 @@ def get_class_labels(data):
 
 
 def get_video_names_and_annotations(data, subset):
-    pass
+    video_names = []
+    annotations = []
+
+    for key, value in data['database'].items():
+        this_subset = value['subset']
+        if this_subset == subset:
+            label = value['annotations']['label']
+            video_names.append(key)
+            annotations.append(value['annotations'])
+
+    return video_names, annotations
 
 
 def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                  sample_duration):
-    pass
+    data = load_annotation_data(annotation_path)
+    video_names, annotations = get_video_names_and_annotations(data, subset)
+    class_to_idx = get_class_labels(data)
+    idx_to_class = {}
+    for name, label in class_to_idx.items():
+        idx_to_class[label] = name
+
+    dataset = []
+    for i in range(len(video_names)):
+        if i % 1000 == 0:
+            print('dataset loading [{}/{}]'.format(i, len(video_names)))
+
+        video_path = os.path.join(root_path, video_names[i])
+        if not os.path.exists(video_path):
+            continue
+        
+        n_frames_file_path = os.path.join(video_path, 'n_frames')
+        n_frames = int(load_value_file(n_frames_file_path))
+        if n_frames <= 0:
+            continue
+
+        begin_t = 1
+        end_t = n_frames
+        sample = {
+            'video': video_path,
+            'segment': [begin_t, end_t],
+            'n_frames': n_frames,
+            'video_id': video_names[i]
+        }
+        if len(annotations) != 0:
+            sample['label'] = class_to_idx[annotations[i]['label']]
+        else:
+            sample['label'] = -1
+
+        if n_samples_for_each_video == 1:
+            sample['frame_indices'] = list(range(1, n_frames + 1))
+            dataset.append(sample)
+        else:
+            if n_samples_for_each_video > 1:
+                step = max(1,
+                           math.ceil((n_frames - 1 - sample_duration) /
+                                     (n_samples_for_each_video - 1)))
+            else:
+                step = sample_duration
+            for j in range(1, n_frames, int(step)):
+                sample_j = copy.deepcopy(sample)
+                sample_j['frame_indices'] = list(
+                    range(j, min(n_frames + 1, j + sample_duration)))
+                dataset.append(sample_j)
+
+    return dataset, idx_to_class
 
 
 class Jester(data.Dataset):
