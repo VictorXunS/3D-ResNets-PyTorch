@@ -1,5 +1,25 @@
 # 3D ResNets for Action Recognition
 
+## Update VictorXunS Fork (2018/7/26)
+
+Adapted repository for training 20bn-jester-v1 dataset
+
+* Download videos and train/val/test splits [here](https://20bn.com/datasets/jester/v1#download).
+
+* Generate n_frames files using ```utils/n_frames_20bn-jester.py```
+
+```bash
+python utils/n_frames_20bn-jester.py jpg_video_directory
+```
+
+* Generate annotation file in json format similar to ActivityNet using ```utils/ucf101_json.py```
+  * ```annotation_dir_path``` includes jester-v1-labels.csv, jester-v1-test.csv, jester-v1-train.csv, jester-v1-validation.csv
+  * Two numbers stand for respectively maximum number of samples for training/validation classes.
+
+```bash
+python utils/20bn-jester_json.py annotation_dir_path 1000 300
+```
+
 ## Update (2018/2/21)
 
 Our paper "Can Spatiotemporal 3D CNNs Retrace the History of 2D CNNs and ImageNet?" is accepted to CVPR2018!  
