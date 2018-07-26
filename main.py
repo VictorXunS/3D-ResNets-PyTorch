@@ -66,11 +66,17 @@ if __name__ == '__main__':
         elif opt.train_crop == 'center':
             crop_method = MultiScaleCornerCrop(
                 opt.scales, opt.sample_size, crop_positions=['c'])
-        spatial_transform = Compose([
-            crop_method,
-            RandomHorizontalFlip(),
-            ToTensor(opt.norm_value), norm_method
-        ])
+        if not opt.no_hflip:
+            spatial_transform = Compose([
+                crop_method,
+                RandomHorizontalFlip(),
+                ToTensor(opt.norm_value), norm_method
+            ])
+        else:
+            spatial_transform = Compose([
+                crop_method,
+                ToTensor(opt.norm_value), norm_method
+            ])
         temporal_transform = TemporalRandomCrop(opt.sample_duration)
         target_transform = ClassLabel()
         training_data = get_training_set(opt, spatial_transform,
