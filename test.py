@@ -5,6 +5,7 @@ import time
 import os
 import sys
 import json
+import csv
 
 from utils import AverageMeter
 
@@ -24,6 +25,17 @@ def calculate_video_results(output_buffer, video_id, test_results, class_names):
     test_results['results'][video_id] = video_results
 
 
+def save_json_result_as_csv(opt, test_results):
+
+    with open(os.path.join(opt.result_path, '{}.csv'.format(
+                           opt.test_subset)), 'w') as csvfile:
+
+        spamwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_NONE, escapechar=' ')
+        for video_id in test_results['results']:
+            video_results = test_results['results'][video_id]
+            spamwriter.writerow([video_id, video_results[0]['label']])
+
+
 def test(data_loader, model, opt, class_names):
     print('test')
 
@@ -36,10 +48,12 @@ def test(data_loader, model, opt, class_names):
     output_buffer = []
     previous_video_id = ''
     test_results = {'results': {}}
+
     for i, (inputs, targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
 
-        inputs = Variable(inputs, volatile=True)
+        with torch.no_grad():
+            inputs = Variable(inputs)
         outputs = model(inputs)
         if not opt.no_softmax_in_test:
             outputs = F.softmax(outputs)
@@ -57,6 +71,7 @@ def test(data_loader, model, opt, class_names):
                     os.path.join(opt.result_path, '{}.json'.format(
                         opt.test_subset)), 'w') as f:
                 json.dump(test_results, f)
+            save_json_result_as_csv(opt, test_results)
 
         batch_time.update(time.time() - end_time)
         end_time = time.time()
@@ -72,3 +87,4 @@ def test(data_loader, model, opt, class_names):
             os.path.join(opt.result_path, '{}.json'.format(opt.test_subset)),
             'w') as f:
         json.dump(test_results, f)
+    save_json_result_as_csv(opt, test_results)
