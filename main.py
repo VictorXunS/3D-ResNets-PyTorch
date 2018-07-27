@@ -149,6 +149,7 @@ if __name__ == '__main__':
             scheduler.step(validation_loss)
 
     if opt.test:
+        assert opt.crop_position_in_test in ['c', 'tl', 'tr', 'bl', 'br']
         spatial_transform = Compose([
             Scale(int(opt.sample_size / opt.scale_in_test)),
             CornerCrop(opt.sample_size, opt.crop_position_in_test),
