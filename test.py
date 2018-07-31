@@ -30,7 +30,7 @@ def save_json_result_as_csv(opt, test_results):
     with open(os.path.join(opt.result_path, '{}.csv'.format(
                            opt.test_subset)), 'w') as csvfile:
 
-        spamwriter = csv.writer(csvfile, delimiter=';', quoting=csv.QUOTE_NONE, escapechar=' ')
+        spamwriter = csv.writer(csvfile, delimiter=';', quoting=csv.QUOTE_NONE, escapechar='')
         for video_id in test_results['results']:
             video_results = test_results['results'][video_id]
             spamwriter.writerow([video_id, video_results[0]['label']])
